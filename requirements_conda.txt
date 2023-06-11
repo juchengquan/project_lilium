@@ -1,0 +1,5 @@
+nginx==1.21.6
+ffmpeg==4.2.2
+libpng==1.6.39
+cudatoolkit==11.7.0
+cudnn==8.2.1.32
