@@ -39,4 +39,8 @@ decode_config: # https://huggingface.co/docs/transformers/internal/tokenization_
   new_tokens_only: true
 
 stream_config:
-  stream_interval: 3
+  stream_new_tokens: true
+  stream_interval: 5
+  stop_str: 
+  - "<|endoftext|>"
+  stop_token_ids: 

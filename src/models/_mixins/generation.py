@@ -73,7 +73,7 @@ class LLMGenerationMixin:
         
         context_len = encode_config.get("max_length", 2048)
         
-        echo = decode_config.get("new_tokens_only", False) # TODO
+        stream_new_tokens = stream_config.get("stream_new_tokens", False)
         stream_interval: int = stream_config.get("max_length", 2)
         stop_str = stream_config.get("stop_str", None)
         if isinstance(stop_str, str):
@@ -111,6 +111,7 @@ class LLMGenerationMixin:
                 device=self._first_device,
             )
 
+        output = ""
         past_key_values = out = None
         for i in range(max_new_tokens):
             if i == 0:
@@ -171,15 +172,15 @@ class LLMGenerationMixin:
                 stopped = False
 
             if i % stream_interval == 0 or i == max_new_tokens - 1 or stopped:
-                if echo:
+                if not stream_new_tokens:
                     tmp_output_ids = output_ids
                     rfind_start = len_prompt
+                    last_output_len = 0
                 else:
                     tmp_output_ids = output_ids[input_echo_len:]
                     rfind_start = 0
-                    # modity to make sure it only outputs new tokens every time
-                    input_echo_len = len(output_ids) 
-
+                    last_output_len = len(output)
+                    
                 output = tokenizer.decode(
                     tmp_output_ids,
                     skip_special_tokens=decode_config.get("skip_special_tokens", False),
@@ -218,9 +219,9 @@ class LLMGenerationMixin:
                         finish_reason = "stop"
                     else:
                         finish_reason = None
-                        
+                    
                     res = {
-                        "generted_text": output,
+                        "generated_text": output[last_output_len:],
                         "usage": {
                             "prompt_tokens": input_echo_len,
                             "completion_tokens": i,
