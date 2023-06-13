@@ -9,7 +9,7 @@ class BaseLM(object):
         # Load model and tokenizer and generation_config
         self._model, self._first_device = load_model()
         self._tokenizer = load_tokenizer()
-        self._generation_config, self._encode_config, self._decode_config = load_all_configs()
+        self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
 
     @property
     def model(self):
@@ -69,6 +69,18 @@ class BaseLM(object):
     
     @decode_config.deleter
     def decode_config(self):
+        raise AttributeError("Can't delete attribute")
+    
+    @property
+    def stream_config(self):
+        return self._stream_config
+    
+    # @stream_config.setter
+    # def stream_config(self, value):
+    #     self.stream_config = value
+    
+    @stream_config.deleter
+    def stream_config(self):
         raise AttributeError("Can't delete attribute")
     
     @property

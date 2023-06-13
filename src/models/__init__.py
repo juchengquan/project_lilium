@@ -15,7 +15,7 @@ try:
         eval("BaseLM, " + f"{','.join(MODEL_CONFIG['mixins'])}")
     )()
     __all__ += ["HuggingFaceLM"]
-
 except Exception as err:
+    print(err)
     logger.info(err)
     raise ImportError(f"Cannot import module: {MODEL_CONFIG['template_name']}")

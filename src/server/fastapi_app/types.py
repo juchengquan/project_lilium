@@ -1,8 +1,5 @@
 from pydantic import BaseModel
 from typing import Union, List
-
-class ExperimentalFlag(BaseModel):
-    experiment: bool = False
  
 class BatchRequest(BaseModel):
     inputs: Union[List[str], str, None] = None

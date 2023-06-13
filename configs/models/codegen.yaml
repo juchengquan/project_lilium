@@ -34,7 +34,9 @@ encode_config: # https://huggingface.co/docs/transformers/internal/tokenization_
   max_length: 512
   return_token_type_ids: false
   
-
 decode_config: # https://huggingface.co/docs/transformers/internal/tokenization_utils#transformers.PreTrainedTokenizerBase.batch_decode
   skip_special_tokens: true
   new_tokens_only: true
+
+stream_config:
+  stream_interval: 3

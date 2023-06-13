@@ -21,4 +21,18 @@ def createClass(cls_list):
 
             return output_texts
         
+        def generate_response_stream(self,
+            input_texts: Union[List[str], str] = "",
+        ) -> Union[List[str], str]:
+            # TODO: change input type
+            output_texts = self.generate_stream(
+                input_texts=input_texts, 
+                generation_config=self.generation_config,
+                encode_config=self.encode_config,
+                decode_config=self.decode_config,
+                stream_config=self.stream_config,
+            )
+
+            return output_texts
+        
     return HuggingFaceLM

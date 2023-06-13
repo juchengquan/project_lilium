@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from .types import BatchRequest, BatchResponse
 
 from ...utils.logging import logger
-from ...models_llm import HuggingFaceLM
+from ...models import HuggingFaceLM
 
 app = FastAPI()
 
@@ -41,3 +41,20 @@ async def inference(payload: BatchRequest):
         generated_text=result,
         elasped_time=round(t_e, 3),
     )]
+
+
+from fastapi.responses import StreamingResponse
+
+
+@app.post("/infer_stream")
+async def inference_stream(payload: BatchRequest):
+    payload = payload.dict()
+    # TODO: change input type
+    # if isinstance(payload["inputs"], str):
+    #     payload["inputs"] = [payload["inputs"]]
+    
+    result = HuggingFaceLM.generate_response_stream(
+        input_texts=payload["inputs"],
+    )
+    
+    return StreamingResponse(result)
