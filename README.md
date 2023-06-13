@@ -23,7 +23,7 @@ A web framework easy to deploy large language model (LLM) applications.
 Or: 
 
 ```bash
-export $PORT=8080 && \
+export PORT=8080 && \
 source activate py3_10 && \
 python ./main.py -f /path/to/config.yaml -p $PORT
 ```
