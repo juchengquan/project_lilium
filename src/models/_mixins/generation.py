@@ -73,6 +73,7 @@ class LLMGenerationMixin:
         
         context_len = encode_config.get("max_length", 2048)
         
+        # include_input = stream_config.get("include_input", False)
         stream_new_tokens = stream_config.get("stream_new_tokens", False)
         stream_interval: int = stream_config.get("max_length", 2)
         stop_str = stream_config.get("stop_str", None)
@@ -80,8 +81,6 @@ class LLMGenerationMixin:
             stop_str = [e for e in stop_str.split(";") if e]
         elif isinstance(stop_str, Iterable):
             stop_str = [e for e in stop_str if e]
-            
-        print(stop_str)
         
         stop_token_ids = stream_config.get("stop_token_ids", None) or []
         stop_token_ids.append(self.tokenizer.eos_token_id)
@@ -172,9 +171,14 @@ class LLMGenerationMixin:
                 stopped = False
 
             if i % stream_interval == 0 or i == max_new_tokens - 1 or stopped:
+                # if include_input:
+                #     tmp_output_ids = output_ids
+                #     rfind_start = len_prompt
+                #     last_output_len = 0
+                # else:
                 if not stream_new_tokens:
-                    tmp_output_ids = output_ids
-                    rfind_start = len_prompt
+                    tmp_output_ids = output_ids[input_echo_len:]
+                    rfind_start = 0
                     last_output_len = 0
                 else:
                     tmp_output_ids = output_ids[input_echo_len:]
@@ -183,8 +187,8 @@ class LLMGenerationMixin:
                     
                 output = tokenizer.decode(
                     tmp_output_ids,
-                    skip_special_tokens=decode_config.get("skip_special_tokens", False),
-                    spaces_between_special_tokens=decode_config.get("spaces_between_special_tokens", False),
+                    skip_special_tokens=stream_config.get("skip_special_tokens", False),
+                    spaces_between_special_tokens=stream_config.get("spaces_between_special_tokens", True),
                 )
 
                 partially_stopped = False

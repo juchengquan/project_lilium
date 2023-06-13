@@ -22,7 +22,7 @@ generation_config:
   return_dict_in_generate: true
   output_scores: false
   do_sample: false
-  max_new_tokens: 8
+  max_new_tokens: 128
   temperature: 0.01
   top_p: 0.92
   top_k: 5
@@ -31,7 +31,7 @@ generation_config:
 encode_config: # https://huggingface.co/docs/transformers/internal/tokenization_utils#transformers.PreTrainedTokenizerBase.__call__
   truncation: true 
   padding: true
-  max_length: 512
+  max_length: 2048
   return_token_type_ids: false
   
 decode_config: # https://huggingface.co/docs/transformers/internal/tokenization_utils#transformers.PreTrainedTokenizerBase.batch_decode
@@ -41,6 +41,7 @@ decode_config: # https://huggingface.co/docs/transformers/internal/tokenization_
 stream_config:
   stream_new_tokens: true
   stream_interval: 5
+  skip_special_tokens: true
   stop_str: 
   - "<|endoftext|>"
   stop_token_ids: 
