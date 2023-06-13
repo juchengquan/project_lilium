@@ -18,7 +18,7 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--MODEL_CONFIG_FILE", type=str, required=True, help="MODEL_CONFIG_FILE")
-    parser.add_argument("-p", "--SERVICE_PORT", type=str, default="8100", help="SERVICE_PORT")
+    parser.add_argument("-p", "--SERVICE_PORT", type=str, default="8080", help="SERVICE_PORT")
     
     args = parser.parse_args()
     os.environ["SERVICE_PORT"] = args.SERVICE_PORT

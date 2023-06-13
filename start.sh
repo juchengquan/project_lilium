@@ -37,7 +37,7 @@ fi
 
 echo "Current ENV activated: ${CONDA_DEFAULT_ENV}"
 
-export SERVICE_PORT=8100
+export SERVICE_PORT=8080
 echo "Service at port: "${SERVICE_PORT}
 python -m uvicorn src.server:app \
     --port ${SERVICE_PORT} \
