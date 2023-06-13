@@ -4,16 +4,18 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from ..utils.logging import logger
 from .model_configuration import MODEL_CONFIG
 
+def get_first_device():
+    if torch.cuda.is_available():
+        _DEVICE = "cuda:0"
+    # elif torch.backends.mps.is_available():
+    #     _DEVICE = "mps"
+    else:
+        _DEVICE = "cpu"        
+    logger.info(f'Device is {_DEVICE}')
+    return _DEVICE
+
 def load_model():
     try:
-        if torch.cuda.is_available():
-            _DEVICE = "cuda:0"
-        # elif torch.backends.mps.is_available():
-        #     _DEVICE = "mps"
-        else:
-            _DEVICE = "cpu"        
-        logger.info(f'Device is {_DEVICE}')
-        
         _model_config = MODEL_CONFIG["model"]
         
         # modify the default name and type
@@ -33,7 +35,7 @@ def load_model():
         logger.error(m)
         raise Exception(m)
 
-    return _model, _DEVICE
+    return _model
 
 def load_tokenizer():
     """ Load tokenizer

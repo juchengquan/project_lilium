@@ -2,12 +2,13 @@
 from abc import abstractmethod
 from typing import Union, List
 
-from .model_loading import load_model, load_tokenizer, load_all_configs
+from .model_loading import get_first_device, load_model, load_tokenizer, load_all_configs
 
 class BaseLM(object):
     def __init__(self) -> None:
+        self._first_device = get_first_device()
         # Load model and tokenizer and generation_config
-        self._model, self._first_device = load_model()
+        self._model = load_model()
         self._tokenizer = load_tokenizer()
         self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
 

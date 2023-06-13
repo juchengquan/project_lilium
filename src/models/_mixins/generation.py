@@ -54,28 +54,19 @@ class LLMGenerationMixin:
         self,
         input_texts: Union[List[str], str] = "",
         generation_config: dict = {},
-        encode_config: dict = {},
-        decode_config: dict = {},
         stream_config: dict = {},
-    ):
-        params = generation_config
-        tokenizer = self.tokenizer
-        model = self.model
-        
-        # inherited from fastchat.serve.inference:
-        prompt = input_texts
-        len_prompt = len(prompt)
-        temperature = float(params.get("temperature", 1.0))
-        repetition_penalty = float(params.get("repetition_penalty", 1.0))
-        top_p = float(params.get("top_p", 1.0))
-        top_k = int(params.get("top_k", -1))  # -1 means disable
-        max_new_tokens = int(params.get("max_new_tokens", 256))
-        
-        context_len = encode_config.get("max_length", 2048)
+    ):  
+        # inherited from fastchat.serve.inference
+        temperature = float(generation_config.get("temperature", 1.0))
+        repetition_penalty = float(generation_config.get("repetition_penalty", 1.0))
+        top_p = float(generation_config.get("top_p", 1.0))
+        top_k = int(generation_config.get("top_k", -1))  # -1 means disable
+        max_new_tokens = int(generation_config.get("max_new_tokens", 256))
+        context_len = generation_config.get("max_length", 2048)
         
         # include_input = stream_config.get("include_input", False)
         stream_new_tokens = stream_config.get("stream_new_tokens", False)
-        stream_interval: int = stream_config.get("max_length", 2)
+        stream_interval: int = stream_config.get("max_length", 3)
         stop_str = stream_config.get("stop_str", None)
         if isinstance(stop_str, str):
             stop_str = [e for e in stop_str.split(";") if e]
@@ -85,7 +76,7 @@ class LLMGenerationMixin:
         stop_token_ids = stream_config.get("stop_token_ids", None) or []
         stop_token_ids.append(self.tokenizer.eos_token_id)
         
-        input_ids = self.tokenizer(prompt).input_ids
+        input_ids = self.tokenizer(input_texts).input_ids
         input_echo_len = len(input_ids)
         output_ids = list(input_ids)
 
@@ -93,51 +84,55 @@ class LLMGenerationMixin:
             temperature, repetition_penalty, top_p, top_k
         )
         
-        if model.config.is_encoder_decoder:
+        if self.model.config.is_encoder_decoder:
             max_src_len = context_len
         else:
-            max_src_len = context_len - max_new_tokens - 8
+            # max_src_len = context_len - max_new_tokens - 8
+            max_src_len = max(context_len - max_new_tokens, 0)
 
         input_ids = input_ids[-max_src_len:]
 
-        if model.config.is_encoder_decoder:
-            encoder_output = model.encoder(
-                input_ids=torch.as_tensor([input_ids], device=self._first_device)
+        if self.model.config.is_encoder_decoder:
+            encoder_output = self.model.encoder(
+                input_ids=torch.as_tensor([input_ids], device=self.first_device)
             )[0]
             start_ids = torch.as_tensor(
-                [[model.generation_config.decoder_start_token_id]],
+                [[self.model.generation_config.decoder_start_token_id]],
                 dtype=torch.int64,
-                device=self._first_device,
+                device=self.first_device,
             )
 
         output = ""
         past_key_values = out = None
         for i in range(max_new_tokens):
             if i == 0:
-                if model.config.is_encoder_decoder:
-                    out = model.decoder(
+                if self.model.config.is_encoder_decoder:
+                    out = self.model.decoder(
                         input_ids=start_ids,
                         encoder_hidden_states=encoder_output,
                         use_cache=True,
                     )
-                    logits = model.lm_head(out[0])
+                    logits = self.model.lm_head(out[0])
                 else:
-                    out = model(torch.as_tensor([input_ids], device=self._first_device), use_cache=True)
+                    out = self.model(
+                        input_ids=torch.as_tensor([input_ids], device=self.first_device), 
+                        use_cache=True,
+                    )
                     logits = out.logits
                 past_key_values = out.past_key_values
             else:
-                if model.config.is_encoder_decoder:
-                    out = model.decoder(
-                        input_ids=torch.as_tensor([[token]], device=self._first_device),
+                if self.model.config.is_encoder_decoder:
+                    out = self.model.decoder(
+                        input_ids=torch.as_tensor([[token]], device=self.first_device),
                         encoder_hidden_states=encoder_output,
                         use_cache=True,
                         past_key_values=past_key_values,
                     )
 
-                    logits = model.lm_head(out[0])
+                    logits = self.model.lm_head(out[0])
                 else:
-                    out = model(
-                        input_ids=torch.as_tensor([[token]], device=self._first_device),
+                    out = self.model(
+                        input_ids=torch.as_tensor([[token]], device=self.first_device),
                         use_cache=True,
                         past_key_values=past_key_values,
                     )
@@ -153,7 +148,7 @@ class LLMGenerationMixin:
             else:
                 last_token_logits = logits[0, -1, :]
 
-            if self._first_device == "mps":
+            if self.first_device == "mps":
                 # Switch to CPU by avoiding some bugs in mps backend.
                 last_token_logits = last_token_logits.float().to("cpu")
 
@@ -176,17 +171,17 @@ class LLMGenerationMixin:
                 #     rfind_start = len_prompt
                 #     last_output_len = 0
                 # else:
-                if not stream_new_tokens:
-                    tmp_output_ids = output_ids[input_echo_len:]
-                    rfind_start = 0
-                    last_output_len = 0
-                else:
+                if stream_new_tokens:
                     tmp_output_ids = output_ids[input_echo_len:]
                     rfind_start = 0
                     last_output_len = len(output)
+                else:    
+                    tmp_output_ids = output_ids[input_echo_len:]
+                    rfind_start = 0
+                    last_output_len = 0
                     
-                output = tokenizer.decode(
-                    tmp_output_ids,
+                output = self.tokenizer.decode(
+                    token_ids=tmp_output_ids,
                     skip_special_tokens=stream_config.get("skip_special_tokens", False),
                     spaces_between_special_tokens=stream_config.get("spaces_between_special_tokens", True),
                 )

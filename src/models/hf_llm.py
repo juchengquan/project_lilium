@@ -28,8 +28,6 @@ def createClass(cls_list):
             output_texts = self.generate_stream(
                 input_texts=input_texts, 
                 generation_config=self.generation_config,
-                encode_config=self.encode_config,
-                decode_config=self.decode_config,
                 stream_config=self.stream_config,
             )
 
