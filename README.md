@@ -17,10 +17,10 @@ A web framework easy to deploy LLM applications.
 4. Start the service by running:
 
 ```bash
-./start.sh -e your_py_env -f /path/to/config.yaml
+./scripts/start.sh -e your_py_env -f /path/to/config.yaml
 ```
 
-Or: 
+Or:
 
 ```bash
 export $PORT=8080 && \

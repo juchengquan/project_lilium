@@ -246,7 +246,23 @@ class LLMGenerationMixin:
         del past_key_values, out
         gc.collect()
         torch.cuda.empty_cache()
-        
+
+class STGenerationMixin:
+    @torch.inference_mode()
+    def generate(
+        self, 
+        input_texts: Union[List[str], str] = "",
+        generation_config: dict = {},
+        encode_config: dict = {},
+        decode_config: dict = {},
+    ):
+        embeddings = self.model.encode(
+            input_texts
+        )
+
+        return embeddings.tolist()
+
+      
 def partial_stop(output, stop_str):
     for i in range(0, min(len(output), len(stop_str))):
         if stop_str.startswith(output[-i:]):

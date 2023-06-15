@@ -1,10 +1,14 @@
 import os, time
 
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+
 from .types import BatchRequest, BatchResponse
 
-from ...utils.logging import logger
-from ...models import HuggingFaceLM
+from ..utils.logging import logger
+
+from ..models import ModelLM
+modelLM = ModelLM()
 
 app = FastAPI()
 
@@ -16,19 +20,19 @@ async def probe():
     )
 
 @app.post("/infer")
-async def inference(payload: BatchRequest):
+async def api_inference(payload: BatchRequest):
     t_s = time.time()
     payload = payload.dict()
 
     if isinstance(payload["inputs"], str):
         payload["inputs"] = [payload["inputs"]]
 
-    result = HuggingFaceLM.generate_response(
+    result = modelLM.generate_response(
         input_texts=payload["inputs"],
     )
 
     logger.info({
-        "inputs": payload,
+        "inputs": payload["inputs"],
         "outputs": result,
     })
 
@@ -42,18 +46,14 @@ async def inference(payload: BatchRequest):
         elasped_time=round(t_e, 3),
     )]
 
-
-from fastapi.responses import StreamingResponse
-
-
 @app.post("/infer_stream")
-async def inference_stream(payload: BatchRequest):
+async def api_inference_stream(payload: BatchRequest):
     payload = payload.dict()
     # TODO: change input type
     # if isinstance(payload["inputs"], str):
     #     payload["inputs"] = [payload["inputs"]]
     
-    result = HuggingFaceLM.generate_response_stream(
+    result = modelLM.generate_response_stream(
         input_texts=payload["inputs"],
     )
     

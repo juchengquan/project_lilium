@@ -1,10 +1,9 @@
 name: "dummy_LM"
-template_name: "dummy_llm"
+
+type: "dummy_model"
+template_name: "dummy"
 
 mixins: 
-- LLMGenerationMixin
-- PreProcessorMixin
-- PostProcessorMixin
 
 model:
   path: ""

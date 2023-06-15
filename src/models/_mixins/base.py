@@ -1,16 +1,19 @@
-# from abc import ABCMeta, abstractmethod
 from abc import abstractmethod
 from typing import Union, List
 
-from .model_loading import get_first_device, load_model, load_tokenizer, load_all_configs
+from ...utils.funcs import get_first_device
 
-class BaseLM(object):
+class Base(object):
     def __init__(self) -> None:
         self._first_device = get_first_device()
+        self._model = None
+        self._tokenizer = None
+        self._generation_config = None
+        
         # Load model and tokenizer and generation_config
-        self._model = load_model()
-        self._tokenizer = load_tokenizer()
-        self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
+        # self._model = load_hf_model()
+        # self._tokenizer = load_tokenizer()
+        # self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
 
     @property
     def model(self):
@@ -96,9 +99,17 @@ class BaseLM(object):
     def first_device(self):
         raise AttributeError("Can't delete attribute")
 
-    @abstractmethod
-    def generate_response(self, 
+
+    def generate_response(self,
             input_texts: Union[List[str], str] = "",
-            generation_config: dict = {},
-        ):
-        pass
+        ) -> Union[List[str], str]:
+            # TODO
+            # if not generation_config and self._generation_config:
+            #     generation_config = self._generation_config
+            
+            return self.generate(
+                input_texts=input_texts, 
+                generation_config=self.generation_config,
+                encode_config=self.encode_config,
+                decode_config=self.decode_config,
+            )

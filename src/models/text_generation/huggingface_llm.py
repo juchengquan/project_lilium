@@ -1,24 +1,37 @@
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from typing import Union, List
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from ..utils.logging import logger
-from .model_configuration import MODEL_CONFIG
+from ...utils.logging import logger
+from ...utils.funcs import load_all_configs
+from ...model_configuration import MODEL_CONFIG
 
-def get_first_device():
-    if torch.cuda.is_available():
-        _DEVICE = "cuda:0"
-    # elif torch.backends.mps.is_available():
-    #     _DEVICE = "mps"
-    else:
-        _DEVICE = "cpu"        
-    logger.info(f'Device is {_DEVICE}')
-    return _DEVICE
+def createClass(cls_list):
+    class ABCLM(*cls_list):
+        def __init__(self):
+            super().__init__()
+            self._model = _load_model()
+            self._tokenizer = _load_tokenizer()
+            self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
 
-def load_model():
+        def generate_response_stream(self,
+            input_texts: Union[List[str], str] = "",
+        ) -> Union[List[str], str]:
+            output_texts = self.generate_stream(
+                input_texts=input_texts, 
+                generation_config=self.generation_config,
+                stream_config=self.stream_config,
+            )
+
+            return output_texts
+        
+    return ABCLM
+
+def _load_model():
     try:
         _model_config = MODEL_CONFIG["model"]
         
         # modify the default name and type
+        exec("import torch")
         _model_config["torch_dtype"] = eval(_model_config["torch_dtype"])
         _model_config["pretrained_model_name_or_path"] = _model_config["path"]
         _model_config.pop("path")
@@ -37,7 +50,7 @@ def load_model():
 
     return _model
 
-def load_tokenizer():
+def _load_tokenizer():
     """ Load tokenizer
     """
     try:
@@ -65,11 +78,3 @@ def load_tokenizer():
         raise Exception(m)
 
     return _tokenizer
-
-def load_all_configs():
-    # TODO
-    return ( MODEL_CONFIG["generation_config"], 
-        MODEL_CONFIG.get("encode_config", {}),
-        MODEL_CONFIG.get("decode_config", {}),
-        MODEL_CONFIG.get("stream_config", {}))
-    

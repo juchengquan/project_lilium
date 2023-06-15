@@ -6,4 +6,5 @@ class BatchRequest(BaseModel):
 
 class BatchResponse(BaseModel):
     generated_text: Union[List[str], str, None] = None
+    embeddings: Union[List[List[float]], List[float]] = None
     elasped_time: Union[float, None] = 0.0

@@ -1,7 +1,7 @@
 import os
 import yaml
 import pathlib
-from ..utils.logging import logger
+from .utils.logging import logger
 
 if not os.environ["MODEL_CONFIG_FILE"]:
     cwd = pathlib.Path(__file__).parent.parent.resolve()

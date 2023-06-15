@@ -1,0 +1,51 @@
+name: "Code Generation Model"
+
+type: "text_generation"
+template_name: "huggingface_llm"
+
+mixins: 
+- LLMGenerationMixin
+- PreProcessorMixin
+- PostProcessorMixin
+
+model:
+  path: ""
+  load_in_8bit: false
+  torch_dtype: "torch.bfloat16"
+  device_map: "auto"
+  
+tokenizer:  
+  path: ""
+  padding_side: "left"
+  truncation_side: "left"
+  set_pad_token: "bos"
+
+generation_config: # https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig
+  return_dict_in_generate: true
+  output_scores: false
+  do_sample: false
+  max_new_tokens: 8
+  repetition_penalty: 1.0
+  temperature: 0.01
+  top_p: 0.92
+  top_k: 5
+  num_beams: 3
+
+encode_config: # https://huggingface.co/docs/transformers/internal/tokenization_utils#transformers.PreTrainedTokenizerBase.__call__
+  return_token_type_ids: false
+  truncation: true 
+  padding: true
+  max_length: 2048
+  
+decode_config: # https://huggingface.co/docs/transformers/internal/tokenization_utils#transformers.PreTrainedTokenizerBase.batch_decode
+  skip_special_tokens: true
+  new_tokens_only: true
+
+stream_config:
+  stream_new_tokens: true
+  stream_interval: 5
+  skip_special_tokens: true
+  stop_str: 
+  - "<|endoftext|>"
+  - "</s>"
+  stop_token_ids: 
