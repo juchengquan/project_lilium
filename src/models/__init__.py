@@ -3,19 +3,24 @@ import importlib
 from ..model_configuration import MODEL_CONFIG
 from ..utils.logging import logger
 
-os.environ["TOKENIZERS_PARALLELISM"] = "false" # To avoid deadlock warning
-
 __all__ = []
 try:
-    exec("from ._mixins.base import Base")
-    if MODEL_CONFIG["mixins"]:
-        exec(f'from ._mixins import {",".join(MODEL_CONFIG["mixins"])}') 
-
-    _m = importlib.import_module(f'.{MODEL_CONFIG["type"]}.{MODEL_CONFIG["model_template"]}', __name__)
-    ModelLM = _m.createClass(
-        eval("Base, " + f'{",".join(MODEL_CONFIG["mixins"])}') if MODEL_CONFIG["mixins"]
-            else [eval("Base")]
-    )
+    from ._mixins.base import Base
+    mixin_list = [Base]
+    
+    mixin_class = importlib.import_module(f'._mixins', package=__name__)
+    for _m in MODEL_CONFIG["mixins"]:
+        logger.info(f"Registering mixin: {_m}.")
+        if hasattr(mixin_class, _m):
+            mixin_list.append(getattr(mixin_class, _m))
+        else:
+            raise NotImplementedError("Mixin in the list nor implemented or wrongly set.")
+        
+    _model = importlib.import_module(f'.{MODEL_CONFIG["type"]}.{MODEL_CONFIG["model_template"]}', package=__name__)
+    logger.info(f"Creating the model object with type: {_model.__name__}.")
+    
+    ModelLM = _model.createClass(mixin_list)
+    logger.info("All mixins are registered successfully.")
     __all__ += ["ModelLM"]
 except Exception as err:
     print(err)

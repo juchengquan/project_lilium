@@ -19,7 +19,7 @@ def _load_model():
         _model_config = MODEL_CONFIG["tokenizer_config"]
         
         # modify the default name and type
-        exec("import torch")
+        import torch # need to keep for the following line
         _model_config["torch_dtype"] = eval(_model_config["torch_dtype"])
         
         _model = AutoModelForCausalLM.from_pretrained(
@@ -27,10 +27,10 @@ def _load_model():
         )
         
         model_name = MODEL_CONFIG["name"]
-        logger.info(f"Model loaded ready: {model_name} ")
+        logger.info(f"Model loaded ready: {model_name}.")
     except Exception as e:
         model_name = MODEL_CONFIG["name"]
-        m = f"Model loaded failed: {model_name}. Exception: {e}"
+        m = f"Model loaded failed: {model_name}; Exception: {e}"
         logger.error(m)
         raise Exception(m)
 
@@ -61,3 +61,5 @@ def _load_tokenizer():
         raise Exception(m)
 
     return _tokenizer
+
+__name__ = "huggingface_llm"

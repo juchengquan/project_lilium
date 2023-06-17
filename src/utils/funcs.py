@@ -15,7 +15,7 @@ def get_first_device(_print: bool = True):
         _DEVICE = "cpu" 
     
     if _print:
-        logger.info(f"Device is {_DEVICE}")
+        logger.info(f"First device is {_DEVICE}.")
     return _DEVICE
 
 def load_all_configs():

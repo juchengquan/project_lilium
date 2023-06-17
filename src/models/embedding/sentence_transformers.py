@@ -34,4 +34,4 @@ def _load_model():
 
     return _model
 
-    
+__name__ = "sentence_transformer"

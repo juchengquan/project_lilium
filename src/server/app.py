@@ -1,5 +1,6 @@
 import pathlib
 import yaml
+import importlib
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
 
@@ -12,22 +13,29 @@ def get_app():
         app = FastAPI(default_response_class=UJSONResponse)
         
         cwd = pathlib.Path(__file__).parent.resolve()
-        with open(str(cwd) + "/endpoints.yaml", "r") as file:
+        with open(str(cwd) + "/service_endpoints.yaml", "r") as file:
             endpoint_setting = yaml.load(file, Loader=yaml.FullLoader)
 
-        from .commons import api_probe
+        from .endpoints import api_probe
         app.add_api_route(path="/", endpoint=api_probe, methods=["GET", "POST"])
         
         modelLM = ModelLM()
         from functools import partial
         for _services in endpoint_setting.get(MODEL_CONFIG.get("type"), []):
-            exec(f'from .commons import {_services["endpoint"]}')
+            _endpoints = importlib.import_module("..endpoints", package=__name__)
             
-            app.add_api_route(
-                path=_services["path"],
-                endpoint=eval(f'partial({_services["endpoint"]}, modelLM=modelLM)'),
-                methods=["POST"],
-            )
+            if hasattr(_endpoints, _services["endpoint"]):
+                pkg_endpoint = getattr(_endpoints, _services["endpoint"])
+                
+                app.add_api_route(
+                    path=_services["path"],
+                    endpoint=partial(pkg_endpoint, modelLM=modelLM),
+                    methods=["POST"],
+                )
+                logger.info(f'Binded function {pkg_endpoint.__name__} at API endpoint: {_services["path"]}')
+                
+            else:
+                raise ValueError(f'No such endpoint: {_services["endpoint"]}')
         
         logger.info("Application has been started.")
         return app

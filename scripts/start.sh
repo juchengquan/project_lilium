@@ -46,6 +46,7 @@ fi
 
 echo "Current ENV activated: ${CONDA_DEFAULT_ENV}"
 
+export TOKENIZERS_PARALLELISM="false" # To avoid deadlock warning
 export SERVICE_PORT=8080
 echo "Service at port: "${SERVICE_PORT}
 python -m uvicorn src.server:app \

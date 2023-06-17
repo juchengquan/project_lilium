@@ -3,12 +3,12 @@ import uvicorn
 from src.utils.logging import logger
 
 def main():
-    cml_readonly_port = os.environ.get("SERVICE_PORT", 8080)
-    logger.info(f"SERVICE_PORT: {cml_readonly_port}")
+    _service_port = os.environ.get("SERVICE_PORT", 8080)
+    logger.info(f"SERVICE_PORT: {_service_port}")
     
     config = uvicorn.Config("src.server:app",
                             host="localhost",
-                            port=int(cml_readonly_port),
+                            port=int(_service_port),
                             log_level="debug",
                             access_log=False)
     server = uvicorn.Server(config)
