@@ -1,0 +1,23 @@
+# type in tokenizer_config
+
+text_generation:
+- path: /infer
+  endpoint: api_inference
+  method: 
+  - POST
+- path: /infer_stream
+  endpoint: api_inference_stream
+  method: 
+  - POST
+
+embedding:
+- path: /embed
+  endpoint: api_embedding
+  method: 
+  - POST
+
+dummy:
+- path: /infer
+  endpoint: api_inference
+  method:
+  - POST

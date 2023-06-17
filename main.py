@@ -7,7 +7,7 @@ def main():
     logger.info(f"SERVICE_PORT: {cml_readonly_port}")
     
     config = uvicorn.Config("src.server:app",
-                            host='localhost',
+                            host="localhost",
                             port=int(cml_readonly_port),
                             log_level="debug",
                             access_log=False)
@@ -15,7 +15,7 @@ def main():
     return server
     # await server.serve()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--MODEL_CONFIG_FILE", type=str, required=True, help="MODEL_CONFIG_FILE")
     parser.add_argument("-p", "--SERVICE_PORT", type=str, default="8080", help="SERVICE_PORT")

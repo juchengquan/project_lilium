@@ -8,12 +8,12 @@ def createClass(cls_list):
             self._tokenizer = None
             self._generation_config = None
 
-        def generate_response(self,
+        def api_generate_response(self,
             input_texts: Union[List[str], str] = "",
         ) -> Union[List[str], str]:
             return f"Dummy result: {input_texts}"
         
-        def generate_response_stream(self,
+        def api_generate_response_stream(self,
             input_texts: Union[List[str], str] = "",
         ) -> Union[List[str], str]:
             import time

@@ -1,18 +1,18 @@
 name: "dummy_LM"
+model_template: "dummy"
 
-type: "dummy_model"
-template_name: "dummy"
+type: "dummy"
 
 mixins: 
 
-model:
-  path: ""
+tokenizer_config:
+  pretrained_model_name_or_path: ""
   load_in_8bit: false
   torch_dtype: "torch.bfloat16"
   device_map: "auto"
   
 tokenizer:  
-  path: ""
+  pretrained_model_name_or_path: ""
   padding_side: "left"
   truncation_side: "left"
   set_pad_token: "bos"

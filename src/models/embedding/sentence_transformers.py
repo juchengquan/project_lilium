@@ -1,10 +1,8 @@
-from typing import Union, List
 from sentence_transformers import SentenceTransformer
 
-from ...model_configuration import MODEL_CONFIG
 from ...utils.logging import logger
 from ...utils.funcs import load_all_configs, get_first_device
-
+from ...model_configuration import MODEL_CONFIG
 
 def createClass(cls_list):
     class ABCLM(*cls_list):
@@ -12,25 +10,13 @@ def createClass(cls_list):
             super().__init__()
             self._model = _load_model()
             self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
-        
-        # TODO 
-        # def generate_response_stream(self,
-        #     input_texts: Union[List[str], str] = "",
-        # ) -> Union[List[str], str]:
-        #     output_texts = self.generate_stream(
-        #         input_texts=input_texts, 
-        #         generation_config=self.generation_config,
-        #         stream_config=self.stream_config,
-        #     )
-
-            # return output_texts
     
     return ABCLM
 
 
 def _load_model():
     try:
-        _model_config = MODEL_CONFIG["model"]
+        _model_config = MODEL_CONFIG["tokenizer_config"]
         # modify the default name and type
         
         _model = SentenceTransformer(

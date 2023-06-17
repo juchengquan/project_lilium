@@ -1,12 +1,13 @@
 name: "Sentence Trans"
-template_name: "sentence_transformers"
 
 type: "embedding"
+model_template: "sentence_transformers"
+
 mixins: 
 - STGenerationMixin
 
-model:
-  model_name_or_path: "/Users/blackmount8/_workspace/model_assets/all-MiniLM-L6-v2"
+tokenizer_config:
+  model_name_or_path: "/path/to/model"
   
 generation_config: # TODO: Remove params
   return_dict_in_generate: true

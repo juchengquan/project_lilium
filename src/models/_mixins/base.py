@@ -1,11 +1,12 @@
 from abc import abstractmethod
 from typing import Union, List
 
+from ...utils.logging import logger
 from ...utils.funcs import get_first_device
 
 class Base(object):
     def __init__(self) -> None:
-        self._first_device = get_first_device()
+        self._first_device = get_first_device(_print=True)
         self._model = None
         self._tokenizer = None
         self._generation_config = None
@@ -99,17 +100,32 @@ class Base(object):
     def first_device(self):
         raise AttributeError("Can't delete attribute")
 
-
-    def generate_response(self,
+    def api_generate_response(self,
             input_texts: Union[List[str], str] = "",
         ) -> Union[List[str], str]:
             # TODO
             # if not generation_config and self._generation_config:
             #     generation_config = self._generation_config
+            if hasattr(self, "generate"):
+                return self.generate(
+                    input_texts=input_texts, 
+                    generation_config=self.generation_config,
+                    encode_config=self.encode_config,
+                    decode_config=self.decode_config,
+                )
+            else:
+                err = NotImplementedError("Method is not implemented.")
+                raise err
             
-            return self.generate(
-                input_texts=input_texts, 
-                generation_config=self.generation_config,
-                encode_config=self.encode_config,
-                decode_config=self.decode_config,
-            )
+    def api_generate_response_stream(self,
+            input_texts: Union[List[str], str] = "",
+        ) -> Union[List[str], str]:
+            if hasattr(self, "generate_stream"):
+                return self.generate_stream(
+                    input_texts=input_texts, 
+                    generation_config=self.generation_config,
+                    stream_config=self.stream_config,
+                )
+            else:
+                err = NotImplementedError("Method is not implemented.")
+                raise err

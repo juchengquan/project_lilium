@@ -4,6 +4,8 @@ import torch
 
 from typing import Union, List, Iterable
 
+from abc import abstractmethod
+
 from transformers import GenerationConfig
 from transformers.generation.logits_process import (
     LogitsProcessorList,
@@ -13,7 +15,13 @@ from transformers.generation.logits_process import (
     TopPLogitsWarper,
 )
 
-class LLMGenerationMixin:
+class _GenerationMixin:
+    @abstractmethod
+    def generate():
+        """To generate something.
+        """
+
+class LLMGenerationMixin(_GenerationMixin):
     @torch.inference_mode()
     def generate(
         self, 
@@ -247,7 +255,7 @@ class LLMGenerationMixin:
         gc.collect()
         torch.cuda.empty_cache()
 
-class STGenerationMixin:
+class STGenerationMixin(_GenerationMixin):
     @torch.inference_mode()
     def generate(
         self, 

@@ -1,6 +1,10 @@
 import torch
+import hashlib
 from .logging import logger
 from ..model_configuration import MODEL_CONFIG
+
+def gen_sha():
+    return hashlib.sha1(b"Nobody inspects the spammish repetition").hexdigest()
 
 def get_first_device(_print: bool = True):
     if torch.cuda.is_available():
@@ -9,8 +13,9 @@ def get_first_device(_print: bool = True):
     #     _DEVICE = "mps"
     else:
         _DEVICE = "cpu" 
-    if not _print:
-        logger.info(f'Device is {_DEVICE}')
+    
+    if _print:
+        logger.info(f"Device is {_DEVICE}")
     return _DEVICE
 
 def load_all_configs():

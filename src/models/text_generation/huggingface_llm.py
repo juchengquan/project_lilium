@@ -1,4 +1,3 @@
-from typing import Union, List
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from ...utils.logging import logger
@@ -12,39 +11,26 @@ def createClass(cls_list):
             self._model = _load_model()
             self._tokenizer = _load_tokenizer()
             self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
-
-        def generate_response_stream(self,
-            input_texts: Union[List[str], str] = "",
-        ) -> Union[List[str], str]:
-            output_texts = self.generate_stream(
-                input_texts=input_texts, 
-                generation_config=self.generation_config,
-                stream_config=self.stream_config,
-            )
-
-            return output_texts
         
     return ABCLM
 
 def _load_model():
     try:
-        _model_config = MODEL_CONFIG["model"]
+        _model_config = MODEL_CONFIG["tokenizer_config"]
         
         # modify the default name and type
         exec("import torch")
         _model_config["torch_dtype"] = eval(_model_config["torch_dtype"])
-        _model_config["pretrained_model_name_or_path"] = _model_config["path"]
-        _model_config.pop("path")
         
         _model = AutoModelForCausalLM.from_pretrained(
             **_model_config,
         )
         
         model_name = MODEL_CONFIG["name"]
-        logger.info(f"{model_name} model loaded ready")
+        logger.info(f"Model loaded ready: {model_name} ")
     except Exception as e:
         model_name = MODEL_CONFIG["name"]
-        m = f"{model_name} model loaded failed. Exception: {e}"
+        m = f"Model loaded failed: {model_name}. Exception: {e}"
         logger.error(m)
         raise Exception(m)
 
@@ -56,9 +42,6 @@ def _load_tokenizer():
     try:
         model_name = MODEL_CONFIG["name"]
         _tokenizer_config = MODEL_CONFIG["tokenizer"]
-        
-        _tokenizer_config["pretrained_model_name_or_path"] = _tokenizer_config["path"]
-        _tokenizer_config.pop("path")
         
         _tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=_tokenizer_config["pretrained_model_name_or_path"], 

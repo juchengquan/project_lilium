@@ -1,21 +1,21 @@
 name: "Code Generation Model"
 
 type: "text_generation"
-template_name: "huggingface_llm"
+model_template: "huggingface_llm"
 
 mixins: 
 - LLMGenerationMixin
 - PreProcessorMixin
 - PostProcessorMixin
 
-model:
-  path: ""
+tokenizer_config:
+  pretrained_model_name_or_path: "/path/to/model"
   load_in_8bit: false
   torch_dtype: "torch.bfloat16"
   device_map: "auto"
   
 tokenizer:  
-  path: ""
+  pretrained_model_name_or_path: "/path/to/model"
   padding_side: "left"
   truncation_side: "left"
   set_pad_token: "bos"
