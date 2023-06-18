@@ -3,6 +3,8 @@ import hashlib
 from .logging import logger
 from ..model_configuration import MODEL_CONFIG
 
+from .datetypes import ConfigDict
+
 def gen_sha():
     return hashlib.sha1(b"Nobody inspects the spammish repetition").hexdigest()
 
@@ -18,9 +20,7 @@ def get_first_device(_print: bool = True):
         logger.info(f"First device is {_DEVICE}.")
     return _DEVICE
 
-def load_all_configs():
-    # TODO
-    return ( MODEL_CONFIG["generation_config"], 
-        MODEL_CONFIG.get("encode_config", {}),
-        MODEL_CONFIG.get("decode_config", {}),
-        MODEL_CONFIG.get("stream_config", {}))
+def load_config_from_yaml(ele):
+    return ConfigDict(
+        MODEL_CONFIG.get(ele, {})
+    )

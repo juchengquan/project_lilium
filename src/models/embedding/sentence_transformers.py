@@ -1,18 +1,24 @@
-from sentence_transformers import SentenceTransformer
+try:
+    from sentence_transformers import SentenceTransformer
+except ModuleNotFoundError as err:
+    raise(err) 
 
 from ...utils.logging import logger
-from ...utils.funcs import load_all_configs, get_first_device
+from ...utils.funcs import load_config_from_yaml, get_first_device
 from ...model_configuration import MODEL_CONFIG
 
 def createClass(cls_list):
     class ABCLM(*cls_list):
         def __init__(self):
             super().__init__()
+            for ele in [
+                "generation_config", "encode_config", "decode_config", "stream_config"
+            ]:
+                self.__setattr__(ele, load_config_from_yaml(ele))
+            
             self._model = _load_model()
-            self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
     
     return ABCLM
-
 
 def _load_model():
     try:

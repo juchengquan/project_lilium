@@ -3,7 +3,6 @@ import importlib
 from ..model_configuration import MODEL_CONFIG
 from ..utils.logging import logger
 
-__all__ = []
 try:
     from ._mixins.base import Base
     mixin_list = [Base]
@@ -21,8 +20,11 @@ try:
     
     ModelLM = _model.createClass(mixin_list)
     logger.info("All mixins are registered successfully.")
-    __all__ += ["ModelLM"]
 except Exception as err:
     print(err)
     logger.error(err)
     raise ImportError(f'Cannot import module: {MODEL_CONFIG["model_template"]}')
+
+__all__ = [
+    "ModelLM"
+]

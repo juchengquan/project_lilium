@@ -1,9 +1,9 @@
 import time
 from fastapi.responses import StreamingResponse
 
-from .types import BatchRequest, BatchResponse
-from ..utils.logging import logger
-from ..utils.funcs import gen_sha
+from ..types import BatchRequest, BatchResponse
+from ...utils.logging import logger
+from ...utils.funcs import gen_sha
 
 async def api_probe():
     """ Placeholder endpoint """
@@ -30,7 +30,7 @@ async def api_inference(payload: BatchRequest, modelLM = None):
     if isinstance(payload["inputs"], str):
         payload["inputs"] = [payload["inputs"]]
 
-    result = modelLM.api_generate_response(
+    result = modelLM.func_generate_response(
         input_texts=payload["inputs"],
     )
     
@@ -58,7 +58,7 @@ async def api_inference_stream(payload: BatchRequest, modelLM = None):
     # if isinstance(payload["inputs"], str):
     #     payload["inputs"] = [payload["inputs"]]
     
-    result = modelLM.api_generate_response_stream(
+    result = modelLM.func_generate_response_stream(
         input_texts=payload["inputs"],
     )
     
@@ -77,7 +77,7 @@ async def api_embedding(payload: BatchRequest, modelLM = None):
         "inputs": payload["inputs"],
     })
     
-    result = modelLM.api_generate_response(
+    result = modelLM.func_generate_response(
         input_texts=payload["inputs"],
     )
 
@@ -93,4 +93,3 @@ async def api_embedding(payload: BatchRequest, modelLM = None):
         embeddings=result,
         elasped_time=round(t_e, 3),
     ).dict(exclude_none=True)
-

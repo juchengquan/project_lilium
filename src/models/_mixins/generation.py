@@ -29,7 +29,19 @@ class LLMGenerationMixin(_GenerationMixin):
         generation_config: dict = {},
         encode_config: dict = {},
         decode_config: dict = {},
+        stream_config: dict = {},
     ):
+        # TODO
+        self.generation_config.update_values(generation_config)
+        self.encode_config.update_values(encode_config)
+        self.decode_config.update_values(decode_config)
+        self.stream_config.update_values(stream_config)
+        
+        generation_config = self.generation_config
+        encode_config = self.encode_config
+        decode_config = self.decode_config
+        stream_config = self.stream_config
+        
         input_seq = self.tokenizer(
                 text=input_texts, 
                 return_tensors="pt",
@@ -62,8 +74,21 @@ class LLMGenerationMixin(_GenerationMixin):
         self,
         input_texts: Union[List[str], str] = "",
         generation_config: dict = {},
+        encode_config: dict = {},
+        decode_config: dict = {},
         stream_config: dict = {},
     ):  
+        # TODO cqju
+        self.generation_config.update_values(generation_config)
+        self.encode_config.update_values(encode_config)
+        self.decode_config.update_values(decode_config)
+        self.stream_config.update_values(stream_config)
+        
+        generation_config = self.generation_config
+        encode_config = self.encode_config
+        decode_config = self.decode_config
+        stream_config = self.stream_config
+
         # inherited from fastchat.serve.inference
         temperature = float(generation_config.get("temperature", 1.0))
         repetition_penalty = float(generation_config.get("repetition_penalty", 1.0))
@@ -263,9 +288,18 @@ class STGenerationMixin(_GenerationMixin):
         generation_config: dict = {},
         encode_config: dict = {},
         decode_config: dict = {},
+        stream_config: dict = {},
     ):
+        # TODO
+        self.generation_config.update_values(generation_config)
+        self.encode_config.update_values(encode_config)
+        self.decode_config.update_values(decode_config)
+        self.stream_config.update_values(stream_config)
+        
         embeddings = self.model.encode(
-            input_texts
+            sentences=input_texts,
+            batch_size=self.generation_config.get("batch_size", 32), # TODO
+            show_progress_bar=False
         )
 
         return embeddings.tolist()
