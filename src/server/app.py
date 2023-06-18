@@ -1,16 +1,17 @@
 import pathlib
 import yaml
 import importlib
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.responses import UJSONResponse
 
-from ..utils.logging import logger
+from ..logging import logger
 from ..model_configuration import MODEL_CONFIG
 from ..models import ModelLM
 
 def get_app():
     try:
         app = FastAPI(default_response_class=UJSONResponse)
+        app_router = APIRouter(default_response_class=UJSONResponse)
         
         cwd = pathlib.Path(__file__).parent.resolve()
         with open(str(cwd) + "/service_endpoints.yaml", "r") as file:
@@ -19,7 +20,8 @@ def get_app():
         from .endpoints import api_probe
         app.add_api_route(path="/", endpoint=api_probe, methods=["GET", "POST"])
         
-        modelLM = ModelLM()
+        modelLM = ModelLM() 
+        
         from functools import partial
         for _services in endpoint_setting.get(MODEL_CONFIG.get("type"), []):
             _endpoints = importlib.import_module("..endpoints", package=__name__)
@@ -27,7 +29,7 @@ def get_app():
             if hasattr(_endpoints, _services["endpoint"]):
                 pkg_endpoint = getattr(_endpoints, _services["endpoint"])
                 
-                app.add_api_route(
+                app_router.add_api_route(
                     path=_services["path"],
                     endpoint=partial(pkg_endpoint, modelLM=modelLM),
                     methods=["POST"],
@@ -37,6 +39,7 @@ def get_app():
             else:
                 raise ValueError(f'No such endpoint: {_services["endpoint"]}')
         
+        app.include_router(app_router, prefix="/model")
         logger.info("Application has been started.")
         return app
     except (ImportError) as err:

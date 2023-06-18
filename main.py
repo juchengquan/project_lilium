@@ -1,6 +1,6 @@
 import os, argparse
 import uvicorn
-from src.utils.logging import logger
+from src.logging import logger
 
 def main():
     _service_port = os.environ.get("SERVICE_PORT", 8080)

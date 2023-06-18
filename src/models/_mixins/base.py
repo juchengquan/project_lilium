@@ -1,15 +1,19 @@
-from abc import abstractmethod
+# from abc import abstractmethod
 from typing import Union, List
 
-from ...utils.logging import logger
-from ...utils.funcs import get_first_device
+from ..utils import load_config_from_yaml, get_first_device
 
-class Base(object):
+class Base:
     def __init__(self) -> None:
         self._first_device = get_first_device(_print=True)
         self._model = None
         self._tokenizer = None
         self._generation_config = None
+        
+        for ele in [
+            "generation_config", "encode_config", "decode_config", "stream_config"
+        ]:
+            self.__setattr__(ele, load_config_from_yaml(ele))
         
     @property
     def model(self):

@@ -53,6 +53,6 @@ python -m uvicorn src.server:app \
     --port ${SERVICE_PORT} \
     --workers 1 \
     --log-level info \
-    --log-config ${PROJ_DIR}/src/utils/logging/logging_config.ini
+    --log-config ${PROJ_DIR}/src/logging/logging_config.ini
     # --no-access-log 
     # --reload 

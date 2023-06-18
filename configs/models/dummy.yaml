@@ -1,31 +1,21 @@
 name: "dummy_LM"
-model_template: "dummy"
 
 type: "dummy"
+model_template: "dummy_model"
 
 mixins: 
 
 tokenizer_config:
   pretrained_model_name_or_path: ""
-  load_in_8bit: false
-  torch_dtype: "torch.bfloat16"
-  device_map: "auto"
-  
+
 tokenizer:  
   pretrained_model_name_or_path: ""
-  padding_side: "left"
-  truncation_side: "left"
-  set_pad_token: "bos"
+
 
 generation_config: 
   return_dict_in_generate: true
   output_scores: false
   do_sample: false
-  max_new_tokens: 64
-  temperature: 0.01
-  top_p: 0.92
-  top_k: 5
-  num_beams: 1
 
 encode_config:
 

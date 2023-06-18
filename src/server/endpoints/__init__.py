@@ -1,9 +1,9 @@
 import time
 from fastapi.responses import StreamingResponse
 
+from ...logging import logger
 from ..types import BatchRequest, BatchResponse
-from ...utils.logging import logger
-from ...utils.funcs import gen_sha
+from ..utils import gen_sha
 
 async def api_probe():
     """ Placeholder endpoint """

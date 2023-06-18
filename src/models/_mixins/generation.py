@@ -20,6 +20,23 @@ class _GenerationMixin:
     def generate():
         """To generate something.
         """
+    
+    @abstractmethod
+    def generate_stream():
+        """To generate something in a stream.
+        """
+
+class DummyGenerationMixin(_GenerationMixin):
+    def generate(self, 
+        input_texts: Union[List[str], str] = "",
+    ):
+        return input_texts
+    
+    def generate_stream(self, 
+        input_texts: Union[List[str], str] = "",
+    ):
+        return input_texts
+    
 
 class LLMGenerationMixin(_GenerationMixin):
     @torch.inference_mode()
@@ -303,6 +320,9 @@ class STGenerationMixin(_GenerationMixin):
         )
 
         return embeddings.tolist()
+    
+    def generate_stream(self):
+        raise NotADirectoryError("Method not implemented.")
 
       
 def partial_stop(output, stop_str):

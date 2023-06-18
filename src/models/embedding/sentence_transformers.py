@@ -3,24 +3,12 @@ try:
 except ModuleNotFoundError as err:
     raise(err) 
 
-from ...utils.logging import logger
-from ...utils.funcs import load_config_from_yaml, get_first_device
+from ...logging import logger
 from ...model_configuration import MODEL_CONFIG
 
-def createClass(cls_list):
-    class ABCLM(*cls_list):
-        def __init__(self):
-            super().__init__()
-            for ele in [
-                "generation_config", "encode_config", "decode_config", "stream_config"
-            ]:
-                self.__setattr__(ele, load_config_from_yaml(ele))
-            
-            self._model = _load_model()
-    
-    return ABCLM
+from ..utils import get_first_device
 
-def _load_model():
+def load_model():
     try:
         _model_config = MODEL_CONFIG["tokenizer_config"]
         # modify the default name and type
@@ -31,13 +19,16 @@ def _load_model():
         )
         
         model_name = MODEL_CONFIG["name"]
-        logger.info(f"{model_name} model loaded ready")
+        logger.info(f"Model loaded ready: {model_name}.")
     except Exception as e:
         model_name = MODEL_CONFIG["name"]
-        m = f"{model_name} model loaded failed. Exception: {e}"
+        m = f"Model loaded failed: {model_name}; Exception: {e}"
         logger.error(m)
         raise Exception(m)
 
     return _model
+
+def load_tokenizer():
+    return None
 
 __name__ = "sentence_transformer"
