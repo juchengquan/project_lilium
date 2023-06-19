@@ -39,7 +39,7 @@ def get_app():
             else:
                 raise ValueError(f'No such endpoint: {_services["endpoint"]}')
         
-        app.include_router(app_router, prefix="/model")
+        app.include_router(app_router, prefix=f'/{MODEL_CONFIG.get("type")}')
         logger.info("Application has been started.")
         return app
     except (ImportError) as err:
