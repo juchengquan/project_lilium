@@ -1,37 +1,29 @@
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+try:
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+except ModuleNotFoundError as err:
+    raise(err) 
 
-from ..utils.logging import logger
-from .model_configuration import MODEL_CONFIG
+from ...logging import logger
+from ...model_configuration import MODEL_CONFIG
 
-def get_first_device():
-    if torch.cuda.is_available():
-        _DEVICE = "cuda:0"
-    # elif torch.backends.mps.is_available():
-    #     _DEVICE = "mps"
-    else:
-        _DEVICE = "cpu"        
-    logger.info(f'Device is {_DEVICE}')
-    return _DEVICE
 
 def load_model():
     try:
-        _model_config = MODEL_CONFIG["model"]
+        _model_config = MODEL_CONFIG["tokenizer_config"]
         
         # modify the default name and type
+        import torch # need to keep for the following line
         _model_config["torch_dtype"] = eval(_model_config["torch_dtype"])
-        _model_config["pretrained_model_name_or_path"] = _model_config["path"]
-        _model_config.pop("path")
         
         _model = AutoModelForCausalLM.from_pretrained(
             **_model_config,
         )
         
         model_name = MODEL_CONFIG["name"]
-        logger.info(f"{model_name} model loaded ready")
+        logger.info(f"Model loaded ready: {model_name}.")
     except Exception as e:
         model_name = MODEL_CONFIG["name"]
-        m = f"{model_name} model loaded failed. Exception: {e}"
+        m = f"Model loaded failed: {model_name}; Exception: {e}"
         logger.error(m)
         raise Exception(m)
 
@@ -43,9 +35,6 @@ def load_tokenizer():
     try:
         model_name = MODEL_CONFIG["name"]
         _tokenizer_config = MODEL_CONFIG["tokenizer"]
-        
-        _tokenizer_config["pretrained_model_name_or_path"] = _tokenizer_config["path"]
-        _tokenizer_config.pop("path")
         
         _tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=_tokenizer_config["pretrained_model_name_or_path"], 
@@ -66,10 +55,4 @@ def load_tokenizer():
 
     return _tokenizer
 
-def load_all_configs():
-    # TODO
-    return ( MODEL_CONFIG["generation_config"], 
-        MODEL_CONFIG.get("encode_config", {}),
-        MODEL_CONFIG.get("decode_config", {}),
-        MODEL_CONFIG.get("stream_config", {}))
-    
+__name__ = "huggingface_llm"

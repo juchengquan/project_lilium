@@ -26,6 +26,15 @@ fi
 
 # https://gist.github.com/rdonkin/05915bd86475389a94953997f80db9ff
 export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export PROJ_DIR=$(dirname "${SCRIPT_DIR}")
+
+# Create logging folder
+if [ ! -d ${PROJ_DIR}/log ]; then
+    echo "Creating logging folder: ${PROJ_DIR}/log" && \
+    mkdir -p ${PROJ_DIR}/log
+else
+    echo "Logging folder existed: ${PROJ_DIR}/log"
+fi
 
 if conda info --envs | grep -q ${ENV_NAME}; then
     echo "Environment ${ENV_NAME} already exists. No action required."; 
@@ -37,11 +46,13 @@ fi
 
 echo "Current ENV activated: ${CONDA_DEFAULT_ENV}"
 
+export TOKENIZERS_PARALLELISM="false" # To avoid deadlock warning
 export SERVICE_PORT=8080
 echo "Service at port: "${SERVICE_PORT}
 python -m uvicorn src.server:app \
     --port ${SERVICE_PORT} \
     --workers 1 \
-    --log-level debug \
-    --no-access-log 
+    --log-level info \
+    --log-config ${PROJ_DIR}/src/logging/logging_config.ini
+    # --no-access-log 
     # --reload 

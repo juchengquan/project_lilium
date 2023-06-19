@@ -1,17 +1,20 @@
-# from abc import ABCMeta, abstractmethod
-from abc import abstractmethod
+# from abc import abstractmethod
 from typing import Union, List
 
-from .model_loading import get_first_device, load_model, load_tokenizer, load_all_configs
+from ..utils import load_config_from_yaml, get_first_device
 
-class BaseLM(object):
+class Base:
     def __init__(self) -> None:
-        self._first_device = get_first_device()
-        # Load model and tokenizer and generation_config
-        self._model = load_model()
-        self._tokenizer = load_tokenizer()
-        self._generation_config, self._encode_config, self._decode_config, self._stream_config = load_all_configs()
-
+        self._first_device = get_first_device(_print=True)
+        self._model = None
+        self._tokenizer = None
+        self._generation_config = None
+        
+        for ele in [
+            "generation_config", "encode_config", "decode_config", "stream_config"
+        ]:
+            self.__setattr__(ele, load_config_from_yaml(ele))
+        
     @property
     def model(self):
         return self._model
@@ -40,9 +43,9 @@ class BaseLM(object):
     def generation_config(self):
         return self._generation_config
     
-    # @generation_config.setter
-    # def generation_config(self, value):
-    #     self._generation_config = value
+    @generation_config.setter
+    def generation_config(self, value):
+        self._generation_config = value
     
     @generation_config.deleter
     def generation_config(self):
@@ -52,9 +55,9 @@ class BaseLM(object):
     def encode_config(self):
         return self._encode_config
     
-    # @encode_config.setter
-    # def encode_config(self, value):
-    #     self._encode_config = value
+    @encode_config.setter
+    def encode_config(self, value):
+        self._encode_config = value
     
     @encode_config.deleter
     def encode_config(self):
@@ -64,9 +67,9 @@ class BaseLM(object):
     def decode_config(self):
         return self._decode_config
     
-    # @decode_config.setter
-    # def decode_config(self, value):
-    #     self.decode_config = value
+    @decode_config.setter
+    def decode_config(self, value):
+        self._decode_config = value
     
     @decode_config.deleter
     def decode_config(self):
@@ -76,9 +79,9 @@ class BaseLM(object):
     def stream_config(self):
         return self._stream_config
     
-    # @stream_config.setter
-    # def stream_config(self, value):
-    #     self.stream_config = value
+    @stream_config.setter
+    def stream_config(self, value):
+        self._stream_config = value
     
     @stream_config.deleter
     def stream_config(self):
@@ -96,9 +99,27 @@ class BaseLM(object):
     def first_device(self):
         raise AttributeError("Can't delete attribute")
 
-    @abstractmethod
-    def generate_response(self, 
+    def func_generate_response(self,
             input_texts: Union[List[str], str] = "",
-            generation_config: dict = {},
-        ):
-        pass
+        ) -> Union[List[str], str]:
+            # TODO
+            # if not generation_config and self._generation_config:
+            #     generation_config = self._generation_config
+            if hasattr(self, "generate"):
+                return self.generate(
+                    input_texts=input_texts, 
+                )
+            else:
+                err = NotImplementedError("Method is not implemented.")
+                raise err
+            
+    def func_generate_response_stream(self,
+            input_texts: Union[List[str], str] = "",
+        ) -> Union[List[str], str]:
+            if hasattr(self, "generate_stream"):
+                return self.generate_stream(
+                    input_texts=input_texts, 
+                )
+            else:
+                err = NotImplementedError("Method is not implemented.")
+                raise err
