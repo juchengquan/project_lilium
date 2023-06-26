@@ -1,11 +1,13 @@
 try:
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    import ctranslate2 
+    from transformers import AutoTokenizer
 except ModuleNotFoundError as err:
     raise(err) 
 
 from ...logging import logger
 from ...model_configuration import MODEL_CONFIG
 
+from ..utils import get_first_device
 
 def load_model():
     try:
@@ -13,10 +15,12 @@ def load_model():
         
         # modify the default name and type
         import torch # need to keep for the following line
-        _model_config["torch_dtype"] = eval(_model_config["torch_dtype"])
+        # _model_config["torch_dtype"] = eval(_model_config["torch_dtype"])
         
-        _model = AutoModelForCausalLM.from_pretrained(
-            **_model_config,
+        _model = ctranslate2.Generator(
+            model_path=_model_config["pretrained_model_name_or_path"],
+            device=get_first_device(_print=False),
+            compute_type="auto", # TODO
         )
         
         model_name = MODEL_CONFIG["name"]
@@ -47,7 +51,6 @@ def load_tokenizer():
             _tokenizer.pad_token = _tokenizer.bos_token
         elif _tokenizer_config["set_pad_token"] == "eos":
             _tokenizer.pad_token = _tokenizer.eos_token
-            
     except Exception as err:
         m = "{model_name} tokenizer load failed. Exception: {err}".format(model_name=model_name, err=err)
         logger.error(m)
@@ -55,4 +58,4 @@ def load_tokenizer():
 
     return _tokenizer
 
-__name__ = "huggingface_llm"
+# __name__ = "huggingface_llm"

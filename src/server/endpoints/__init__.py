@@ -2,8 +2,13 @@ import time
 from fastapi.responses import StreamingResponse
 
 from ...logging import logger
+
 from ..types import BatchRequest, BatchResponse
 from ..utils import gen_sha
+from ...models import ModelLM
+
+# TODO: cqju: how to move this out of skeleton?
+modelLM = ModelLM()
 
 async def api_probe():
     """ Placeholder endpoint """
@@ -13,7 +18,7 @@ async def api_probe():
         generated_text="OK",
     )
     
-async def api_inference(payload: BatchRequest, modelLM = None):
+async def api_inference(payload: BatchRequest): 
     t_s = time.time()
     trace_id = gen_sha()
     
@@ -52,7 +57,7 @@ async def api_inference(payload: BatchRequest, modelLM = None):
         ).dict(exclude_none=True)
     ]
     
-async def api_inference_stream(payload: BatchRequest, modelLM = None):
+async def api_inference_stream(payload: BatchRequest):
     payload = payload.dict()
     # TODO: change input type
     # if isinstance(payload["inputs"], str):
@@ -64,7 +69,7 @@ async def api_inference_stream(payload: BatchRequest, modelLM = None):
     
     return StreamingResponse(result)
 
-async def api_embedding(payload: BatchRequest, modelLM = None):
+async def api_embedding(payload: BatchRequest):
     t_s = time.time()
     trace_id = gen_sha()
     payload = payload.dict()

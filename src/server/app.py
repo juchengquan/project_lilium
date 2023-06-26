@@ -6,7 +6,6 @@ from fastapi.responses import UJSONResponse
 
 from ..logging import logger
 from ..model_configuration import MODEL_CONFIG
-from ..models import ModelLM
 
 def get_app():
     try:
@@ -20,7 +19,6 @@ def get_app():
         from .endpoints import api_probe
         app.add_api_route(path="/", endpoint=api_probe, methods=["GET", "POST"])
         
-        modelLM = ModelLM() 
         
         from functools import partial
         for _services in endpoint_setting.get(MODEL_CONFIG.get("type"), []):
@@ -29,9 +27,17 @@ def get_app():
             if hasattr(_endpoints, _services["endpoint"]):
                 pkg_endpoint = getattr(_endpoints, _services["endpoint"])
                 
-                app_router.add_api_route(
+                # TODO: cqju: Seems wierd for post method working
+                # @app.post(path=_services["path"],)
+                # async def shell_func(payload: BatchRequest):
+                #     logger.info("WTF")
+                #     return await pkg_endpoint(payload=payload, modelLM=modelLM)
+                
+                # TODO
+                # partial(pkg_endpoint, modelLM=modelLM)
+                app.add_api_route(
                     path=_services["path"],
-                    endpoint=partial(pkg_endpoint, modelLM=modelLM),
+                    endpoint=pkg_endpoint, # partial(pkg_endpoint, modelLM=modelLM),
                     methods=["POST"],
                 )
                 logger.info(f'Binded function {pkg_endpoint.__name__} at API endpoint: {_services["path"]}')
@@ -39,7 +45,7 @@ def get_app():
             else:
                 raise ValueError(f'No such endpoint: {_services["endpoint"]}')
         
-        app.include_router(app_router, prefix=f'/{MODEL_CONFIG.get("type")}')
+        app.include_router(app_router) #, prefix=f'/{MODEL_CONFIG.get("type")}')
         logger.info("Application has been started.")
         return app
     except (ImportError) as err:

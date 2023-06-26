@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Union, List
- 
+
 class BatchRequest(BaseModel):
     inputs: Union[List[str], str, None] = None
 

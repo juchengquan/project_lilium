@@ -1,4 +1,4 @@
-# type in tokenizer_config
+# TODO: may need mode templated for diff models (e.g., HF, CT2)
 
 text_generation:
 - path: /infer

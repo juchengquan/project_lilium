@@ -1,4 +1,3 @@
-# from abc import abstractmethod
 from typing import Union, List
 
 from ..utils import load_config_from_yaml, get_first_device

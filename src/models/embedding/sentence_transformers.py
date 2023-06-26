@@ -10,7 +10,7 @@ from ..utils import get_first_device
 
 def load_model():
     try:
-        _model_config = MODEL_CONFIG["tokenizer_config"]
+        _model_config = MODEL_CONFIG["model_config"]
         # modify the default name and type
         
         _model = SentenceTransformer(

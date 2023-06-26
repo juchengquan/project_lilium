@@ -5,10 +5,10 @@ model_template: "dummy_model"
 
 mixins: 
 
-tokenizer_config:
+model_config:
   pretrained_model_name_or_path: ""
 
-tokenizer:  
+tokenizer_config:  
   pretrained_model_name_or_path: ""
 
 

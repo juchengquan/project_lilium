@@ -4,17 +4,17 @@ type: "text_generation"
 model_template: "huggingface_llm"
 
 mixins: 
-- LLMGenerationMixin
+- HFTextGenerationMixin
 - PreProcessorMixin
 - PostProcessorMixin
 
-tokenizer_config:
+model_config:
   pretrained_model_name_or_path: "/path/to/model"
   load_in_8bit: false
   torch_dtype: "torch.bfloat16"
   device_map: "auto"
   
-tokenizer:  
+tokenizer_config:  
   pretrained_model_name_or_path: "/path/to/model"
   padding_side: "left"
   truncation_side: "left"

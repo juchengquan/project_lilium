@@ -18,18 +18,18 @@ def createClass(cls_list):
     
     return ABCLM
 
-from .generation import DummyGenerationMixin
-
-from .generation import LLMGenerationMixin
+from .generation import DummyGenerationMixin, HFTextGenerationMixin, STGenerationMixin, CT2TextGenerationMixin
+# TODO: to be more robust
 from .post_processing import PostProcessorMixin
 from .pre_processing import PreProcessorMixin
 
-from .generation import STGenerationMixin
+
 
 __all__ = [
     "DummyGenerationMixin", 
     
-    "LLMGenerationMixin",
+    "HFTextGenerationMixin",
+    "CT2TextGenerationMixin"
     
     "STGenerationMixin",
     
